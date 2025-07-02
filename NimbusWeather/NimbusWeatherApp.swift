@@ -25,7 +25,7 @@ struct NimbusWeatherApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            WeatherView()
         }
         .modelContainer(sharedModelContainer)
     }
