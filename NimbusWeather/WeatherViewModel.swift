@@ -14,7 +14,6 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var weather: Weather? //Not Initializing
     @Published var isLoading = false
     @Published var errorMessage: String? //Not Initializing
-    
     private let locationManager = CLLocationManager()
     private let weatherService = WeatherService()
     
