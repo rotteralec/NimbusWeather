@@ -6,80 +6,82 @@
 //
 
 
+
 import SwiftUI
-import CoreLocation
-import WeatherKit
 
 struct WeatherView: View {
     @StateObject private var viewModel = WeatherViewModel()
 
     var body: some View {
         VStack {
+            Spacer() // Pushes content towards the center/top
+
             if viewModel.isLoading {
-                ProgressView("Loading Weather...")
+                ProgressView("Loading Cloud Coverage...")
+                    .font(.title2)
             } else if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                Button("Retry") {
-                    viewModel.requestLocationFetchWeather()
-                }
-            } else if let weather = viewModel.weather {
-                VStack(spacing: 20) {
-                    Text("Current Weather")
+                VStack(spacing: 15) {
+                    Image(systemName: "exclamationmark.triangle.fill")
                         .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 10)
-
-                    Image(systemName: weather.currentWeather.symbolName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 100)
-                        .padding(.bottom, 10)
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        WeatherInfoRow(label: "Temperature", value: weather.currentWeather.temperature.formatted())
-                        WeatherInfoRow(label: "Feels Like", value: weather.currentWeather.apparentTemperature.formatted())
-                        WeatherInfoRow(label: "Condition", value: weather.currentWeather.condition.description)
-                        WeatherInfoRow(label: "Cloud Coverage", value: String(format: "%.0f%%", weather.currentWeather.cloudCover * 100))
-                        WeatherInfoRow(label: "Humidity", value: weather.currentWeather.humidity.formatted(.percent))
-                        WeatherInfoRow(label: "Wind Speed", value: weather.currentWeather.wind.speed.formatted())
-                        WeatherInfoRow(label: "Wind Direction", value: weather.currentWeather.wind.compassDirection.description)
+                        .foregroundColor(.orange)
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    Button("Retry Fetch") { // Changed text from "Retry" to clarify
+                        viewModel.fetchCloudCoverage()
                     }
-                    .padding(.horizontal)
+                    .buttonStyle(.borderedProminent)
                 }
-                .padding()
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(15)
-                .shadow(radius: 5)
+            } else if let cloudCoverage = viewModel.cloudCoverage {
+                // Display cloud coverage as a percentage
+                Text("Cloud Coverage")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 5)
+
+                Text(String(format: "%.0f%%", cloudCoverage * 100))
+                    .font(.system(size: 80, weight: .semibold, design: .rounded))
+                    .foregroundColor(.blue)
+
+                // Optional: Add a subtle icon based on coverage
+                Image(systemName: getCloudIcon(for: cloudCoverage))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+                    .foregroundColor(.gray)
+                    .opacity(0.8)
+                    .padding(.top, 20)
+
             } else {
-                Text("Tap 'Get Weather' to fetch current conditions.")
+                Text("Cloud Coverage will appear here.")
                     .font(.headline)
-                Button("Get Weather") {
-                    viewModel.requestLocationFetchWeather()
+                    .padding(.bottom, 20)
+                Button("Get Cloud Coverage") {
+                    viewModel.fetchCloudCoverage()
                 }
                 .buttonStyle(.borderedProminent)
             }
+            Spacer() // Pushes content towards the center/bottom
         }
+        .padding()
         .onAppear {
-            viewModel.requestLocationFetchWeather()
+            // Fetch weather directly when the view appears (no location request needed)
+            viewModel.fetchCloudCoverage()
         }
     }
-}
 
-// Helper View for displaying weather info rows
-struct WeatherInfoRow: View {
-    let label: String
-    let value: String
-
-    var body: some View {
-        HStack {
-            Text(label + ":")
-                .font(.headline)
-            Spacer()
-            Text(value)
-                .font(.body)
+    // Helper function to get an SF Symbol based on cloud coverage
+    private func getCloudIcon(for coverage: Double) -> String {
+        switch coverage {
+        case 0.0..<0.15: // 0-14%
+            return "sun.max.fill"
+        case 0.15..<0.40: // 15-39%
+            return "cloud.sun.fill"
+        case 0.40..<0.70: // 40-69%
+            return "cloud.fill"
+        default: // 70-100%
+            return "cloud.heavyrain.fill" // Or just "cloud.fill" if you prefer
         }
     }
 }
@@ -89,54 +91,4 @@ struct WeatherView_Previews: PreviewProvider {
         WeatherView()
     }
 }
-//struct ContentView: View {
-//    @Environment(\.modelContext) private var modelContext
-//    @Query private var items: [Item]
-//
-//    var body: some View {
-//        NavigationSplitView {
-//            List {
-//                ForEach(items) { item in
-//                    NavigationLink {
-//                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-//                    } label: {
-//                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-//                    }
-//                }
-//                .onDelete(perform: deleteItems)
-//            }
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    EditButton()
-//                }
-//                ToolbarItem {
-//                    Button(action: addItem) {
-//                        Label("Add Item", systemImage: "plus")
-//                    }
-//                }
-//            }
-//        } detail: {
-//            Text("Select an item")
-//        }
-//    }
-//
-//    private func addItem() {
-//        withAnimation {
-//            let newItem = Item(timestamp: Date())
-//            modelContext.insert(newItem)
-//        }
-//    }
-//
-//    private func deleteItems(offsets: IndexSet) {
-//        withAnimation {
-//            for index in offsets {
-//                modelContext.delete(items[index])
-//            }
-//        }
-//    }
-//}
 
-#Preview {
-    WeatherView()
-        
-}

@@ -6,94 +6,52 @@
 //
 
 
-import CoreLocation
+
+
+import CoreLocation // Still needed for CLLocation type
 import WeatherKit
 import Foundation
 
-class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var weather: Weather? //Not Initializing
+class WeatherViewModel: ObservableObject {
+    @Published var cloudCoverage: Double? // Will be 0.0 to 1.0
     @Published var isLoading = false
-    @Published var errorMessage: String? //Not Initializing
-    private let locationManager = CLLocationManager()
+    @Published var errorMessage: String?
+
     private let weatherService = WeatherService()
-    
-    override init() {
-        super.init()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyReduced
-    }
-    
-    
-    func requestLocationFetchWeather() {
+
+    // Hardcoded location for Cloud Coverage (42.53, -83.42)
+    private let fixedLocation = CLLocation(latitude: 42.53, longitude: -83.42)
+
+    func fetchCloudCoverage() {
         isLoading = true
         errorMessage = nil
-        
-        switch locationManager.authorizationStatus {
-        case .notDetermined:
-            locationManager.requestWhenInUseAuthorization()
-        case .authorizedWhenInUse, .authorizedAlways:
-            locationManager.requestLocation()
-        case .denied, .restricted:
-            errorMessage = "Location access denied. Please enable location services in settings to use this app."
-            isLoading = false
-        @unknown default:
-            errorMessage = "An unknown error occured with location services."
-            isLoading = false
-            
-        }
-    }
-    
-    // CLLocationManagerDelegate
-    
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
-            manager.requestLocation() //Request location once authorization is granted
-        } else if manager.authorizationStatus == .denied || manager.authorizationStatus == .restricted {
-            errorMessage = "Location access denied. Please enable location services in settings to use this app."
-            isLoading = false
-        }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.first else {
-            errorMessage = "Could not get current location."
-            isLoading = false
-            return
-        }
-        fetchWeather(for: location)
-    }
-    
-    
-    //WeatherKit
-    
-    private func fetchWeather(for location: CLLocation) {
+        cloudCoverage = nil // Clear previous data
+
         Task {
             do {
-                //Fetch current weather, daily forcasts and wind
-                // Fetch current weather, daily forecasts, and wind
-                
-                let currentWeather = try await weatherService.weather(for: location)
-//                let (currentWeather, dailyForecast, wind) = try await weatherService.weather(
-//                    for: location,
-//                    including: .current, .daily(.days(1)), .wind
-//                )
-                
-                //Exctract relevant info here
-                //TODO: create a struct to hold below data
+                // Fetch only current weather to get cloudCover for the fixed location
+                let currentWeather = try await weatherService.weather(for: fixedLocation, including: .current)
+
+                // Ensure updates happen on the main thread
                 DispatchQueue.main.async {
-                    self.weather = currentWeather
-                    //TODO: This is where I need to put cloud coverage access
-                    
+                    self.cloudCoverage = currentWeather.cloudCover // This is a Double between 0.0 and 1.0
                     self.isLoading = false
                 }
             } catch {
+                // Ensure updates happen on the main thread
                 DispatchQueue.main.async {
-                    self.errorMessage = "Failed to fetch weather: \(error.localizedDescription)."
+                    self.errorMessage = "Failed to fetch weather: \(error.localizedDescription)"
                     self.isLoading = false
-                    print("WeatherKit error: \(error.localizedDescription).")
+                    print("WeatherKit error: \(error.localizedDescription)")
                 }
             }
         }
     }
-    
 }
+
+
+
+
+
+
+
