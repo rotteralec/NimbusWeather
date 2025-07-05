@@ -29,13 +29,14 @@ struct WeatherView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                     Button("Retry Fetch") {
-                        viewModel.fetchCloudCoverage()
+                        viewModel.requestLocationAndFetchCloudCoverage()
                     }
                     .buttonStyle(.borderedProminent)
                 }
             } else if let cloudCoverage = viewModel.cloudCoverage {//once loading is done
-                // Display cloud coverage as a percentage
+                
                 let cloudCoverageInt = Int(cloudCoverage*100)
+                // Display cloud coverage as a percentage
                 Text("Cloud Coverage")
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -53,7 +54,7 @@ struct WeatherView: View {
                                 Image("nimbusPics")
                                 .resizable()
                                 .scaledToFit()//Maintain aspect ratio
-                                .frame(width:50, height: 50)
+                                .frame(width:75, height: 75)
                                 .position(
                                     //Randomly position each image within the screen box
                                     x: CGFloat.random(in: 0...geometry.size.width),
@@ -81,7 +82,7 @@ struct WeatherView: View {
                     .font(.headline)
                     .padding(.bottom, 20)
                 Button("Get Cloud Coverage") {
-                    viewModel.fetchCloudCoverage()
+                    viewModel.requestLocationAndFetchCloudCoverage()
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -90,7 +91,7 @@ struct WeatherView: View {
         .padding()
         .onAppear {
             // Fetch weather directly when the view appears (add location request after)
-            viewModel.fetchCloudCoverage()
+            viewModel.requestLocationAndFetchCloudCoverage()
         }
     }// End of body
 
