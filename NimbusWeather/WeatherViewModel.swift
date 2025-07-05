@@ -8,7 +8,7 @@
 
 
 
-import CoreLocation // Still needed for CLLocation type
+import CoreLocation 
 import WeatherKit
 import Foundation
 
@@ -19,7 +19,7 @@ class WeatherViewModel: ObservableObject {
 
     private let weatherService = WeatherService()
 
-    // Hardcoded location for Cloud Coverage (42.53, -83.42)
+    // Hardcoded location for Cloud Coverage (42.53, -83.42) TO CHANGE TO LOCATION REQUEST
     private let fixedLocation = CLLocation(latitude: 42.53, longitude: -83.42)
 
     func fetchCloudCoverage() {
@@ -48,6 +48,7 @@ class WeatherViewModel: ObservableObject {
         }
     }
 }
+
 
 
 

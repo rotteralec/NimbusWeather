@@ -14,12 +14,12 @@ struct WeatherView: View {
 
     var body: some View {
         VStack {
-            Spacer() // Pushes content towards the center/top
-
+            Spacer()
+            //while weatherviewmodel is fetching cloud coverage
             if viewModel.isLoading {
                 ProgressView("Loading Cloud Coverage...")
                     .font(.title2)
-            } else if let errorMessage = viewModel.errorMessage {
+            } else if let errorMessage = viewModel.errorMessage { //Error Message, TODO replace with upside down nim or weird nim pic
                 VStack(spacing: 15) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.largeTitle)
@@ -28,13 +28,14 @@ struct WeatherView: View {
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
-                    Button("Retry Fetch") { // Changed text from "Retry" to clarify
+                    Button("Retry Fetch") {
                         viewModel.fetchCloudCoverage()
                     }
                     .buttonStyle(.borderedProminent)
                 }
-            } else if let cloudCoverage = viewModel.cloudCoverage {
+            } else if let cloudCoverage = viewModel.cloudCoverage {//once loading is done
                 // Display cloud coverage as a percentage
+                let cloudCoverageInt = Int(cloudCoverage*100)
                 Text("Cloud Coverage")
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -43,15 +44,37 @@ struct WeatherView: View {
                 Text(String(format: "%.0f%%", cloudCoverage * 100))
                     .font(.system(size: 80, weight: .semibold, design: .rounded))
                     .foregroundColor(.blue)
-
-                // Optional: Add a subtle icon based on coverage
-                Image(systemName: getCloudIcon(for: cloudCoverage))
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 120, height: 120)
-                    .foregroundColor(.gray)
-                    .opacity(0.8)
-                    .padding(.top, 20)
+                
+                GeometryReader{ geometry in
+                    ZStack {
+                        Color.black.edgesIgnoringSafeArea(.all)
+                        
+                        ForEach(0..<cloudCoverageInt, id: \.self) {_ in
+                                Image("nimbusPics")
+                                .resizable()
+                                .scaledToFit()//Maintain aspect ratio
+                                .frame(width:50, height: 50)
+                                .position(
+                                    //Randomly position each image within the screen box
+                                    x: CGFloat.random(in: 0...geometry.size.width),
+                                    y: CGFloat.random(in: 0...geometry.size.height)
+                                )
+                            //Trying animation or rotation?
+                                .rotationEffect(.degrees(Double.random(in: 0...360)))
+                                .opacity(Double.random(in: 0.6...1.0))
+                        }
+                        
+                    }
+                    
+                }
+                // Change Icon based on coverage
+//                Image("nimbusPics")//getCloudIcon(for: cloudCoverage))
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(width: 120, height: 120)
+//                    //.foregroundColor(.gray)
+//                    .opacity(0.8)
+//                    .padding(.top, 20)
 
             } else {
                 Text("Cloud Coverage will appear here.")
@@ -62,14 +85,14 @@ struct WeatherView: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
-            Spacer() // Pushes content towards the center/bottom
-        }
+            Spacer()
+        }//End of VStack
         .padding()
         .onAppear {
-            // Fetch weather directly when the view appears (no location request needed)
+            // Fetch weather directly when the view appears (add location request after)
             viewModel.fetchCloudCoverage()
         }
-    }
+    }// End of body
 
     // Helper function to get an SF Symbol based on cloud coverage
     private func getCloudIcon(for coverage: Double) -> String {
@@ -81,7 +104,7 @@ struct WeatherView: View {
         case 0.40..<0.70: // 40-69%
             return "cloud.fill"
         default: // 70-100%
-            return "cloud.heavyrain.fill" // Or just "cloud.fill" if you prefer
+            return "cloud.heavyrain.fill"
         }
     }
 }
