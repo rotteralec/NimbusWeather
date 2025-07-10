@@ -29,9 +29,22 @@
 		3574EB482E15C676005AD0F3 /* NimbusWeatherUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NimbusWeatherUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3574EB972E1B2639005AD0F3 /* Exceptions for "NimbusWeather" folder in "NimbusWeather" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3574EB2E2E15C675005AD0F3 /* NimbusWeather */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3574EB312E15C675005AD0F3 /* NimbusWeather */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3574EB972E1B2639005AD0F3 /* Exceptions for "NimbusWeather" folder in "NimbusWeather" target */,
+			);
 			path = NimbusWeather;
 			sourceTree = "<group>";
 		};
@@ -401,6 +414,7 @@
 				DEVELOPMENT_TEAM = ZLXGB3UDLN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NimbusWeather/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "\"Your location is needed to display local weather information.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -431,6 +445,7 @@
 				DEVELOPMENT_TEAM = ZLXGB3UDLN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NimbusWeather/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "\"Your location is needed to display local weather information.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

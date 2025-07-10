@@ -36,6 +36,8 @@ struct WeatherView: View {
             } else if let cloudCoverage = viewModel.cloudCoverage {//once loading is done
                 
                 let cloudCoverageInt = Int(cloudCoverage*100)
+                let flipper = ["nimbusPics", "nimbusPics2"]
+                var dogCounter = 0
                 // Display cloud coverage as a percentage
                 Text("Cloud Coverage")
                     .font(.largeTitle)
@@ -50,8 +52,9 @@ struct WeatherView: View {
                     ZStack {
                         Color.black.edgesIgnoringSafeArea(.all)
                         
-                        ForEach(0..<cloudCoverageInt, id: \.self) {_ in
-                                Image("nimbusPics")
+                        ForEach(0..<cloudCoverageInt, id: \.self) {ind in
+                            let flipInd = (ind%flipper.count)
+                            Image(flipper[flipInd])
                                 .resizable()
                                 .scaledToFit()//Maintain aspect ratio
                                 .frame(width:75, height: 75)
@@ -63,6 +66,7 @@ struct WeatherView: View {
                             //Trying animation or rotation?
                                 .rotationEffect(.degrees(Double.random(in: 0...360)))
                                 .opacity(Double.random(in: 0.6...1.0))
+                            
                         }
                         
                     }
